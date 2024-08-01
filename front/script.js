@@ -90,6 +90,8 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('latestValue').textContent = latestValue;
             document.getElementById('lev1-status').textContent = leverageData.lev1 ? 'Active' : 'Inactive';
             document.getElementById('lev2-status').textContent = leverageData.lev2 ? 'Active' : 'Inactive';
+            document.getElementById('lev3-status').textContent = leverageData.lev3 ? 'Active' : 'Inactive';
+            document.getElementById('lev4-status').textContent = leverageData.lev4 ? 'Active' : 'Inactive';
 
             // Display the latest value in the element with ID 'last'
             document.getElementById('last').textContent = `Latest Value: ${latestValue}`;
