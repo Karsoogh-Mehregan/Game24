@@ -262,7 +262,7 @@ class GetQuestions(APIView):
             coef=1
             if(get_leverage_one()):
                 coef=settings.LEVERAGE_ONE_COEF
-            result.append({"number":q.number,"bought":True,"max-score":q.score,"price":q.value*coef})
+            result.append({"number":q.number,"bought":True,"max-score":q.score,"price":q.value})
             query=QuestionStat.objects.filter(team__id=team).filter(question__number=q.number)
             if(query.count()==0):
                 result[-1]["bought"]=False
