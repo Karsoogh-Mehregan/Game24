@@ -103,12 +103,13 @@ class ExchangeA(APIView):
 
         team.B=team.B+change_to_b(amount)
         team.save()
+        exchanged=change_to_b(amount)
         set_transactions(get_transactions()+change_to_b(amount))
         if(get_transactions()>ALL_TRANSACTIONS):
             set_transactions(0)
             calcuate_b_a()
 
-        return JsonResponse({"message":f"exchanged {change_to_b(amount)} B"})
+        return JsonResponse({"message":f"exchanged {exchanged} B"})
 class ExchangeB(APIView):
     def post(self,request:HttpRequest):
         data=json.loads(request.body)
@@ -120,11 +121,13 @@ class ExchangeB(APIView):
         team.A=team.A+change_to_a(amount)
         set_supply(get_supply()+amount)
         team.save()
+        exchanged=change_to_a(amount)
+
         set_transactions(get_transactions()+amount)
         if(get_transactions()>ALL_TRANSACTIONS):
             set_transactions(0)
             calcuate_b_a()
-        return JsonResponse({"message":f"exchanged +{change_to_a(amount)} A"})
+        return JsonResponse({"message":f"exchanged +{exchanged} A"})
 
 class ScoreBoard(APIView):
     def get(self):
