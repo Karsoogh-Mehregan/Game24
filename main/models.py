@@ -1,18 +1,28 @@
 from django.db import models
 from game.settings import * 
 
+class ALLInfo(models.Model):
+    LEVERAGE_ONE=models.BooleanField(default=False)
+    LEVERAGE_TWO=models.BooleanField(default=False)
+    LEVERAGE_THREE=models.BooleanField(default=False)
+    LEVERAGE_FOUR=models.BooleanField(default=False)
+    demand=models.FloatField(default=0)
+    supply=models.FloatField(default=0)
+    B_A_VALUE=models.FloatField(default=10)
+    TRANSACTIONS=models.IntegerField(default=0)
+
 class Team(models.Model):
 
     name=models.CharField(max_length=30)
     A=models.FloatField(default=300)
     B=models.FloatField(default=20)
-    score=models.IntegerField()
+    score=models.FloatField()
     _stats=["free","pending","not responded","battle","cool down"]
     stat=models.IntegerField(default=0)
     def __str__(self):
         return self.name
     def save(self, *args, **kwargs):
-        self.score=self.A*b_a_value+self.B
+        self.score=self.A/ALLInfo.objects.first().B_A_VALUE+self.B
 
         super().save(*args, **kwargs)
 
@@ -63,3 +73,5 @@ class GameTeam(models.Model):
     won=models.BooleanField(default=False)
     def __str__(self):
         return self.team.name+" "+self.game.name
+    
+

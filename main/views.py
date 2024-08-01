@@ -6,12 +6,14 @@ from .models import Team,Question,Duel
 from django.http import HttpRequest
 from django.http import JsonResponse
 from rest_framework import status
+from .import helper
 from .helper import *
 from .serializers import TeamSerializer,BASerializer,GameSerializer
 from .models import *
 from django.db.models import Q
 from threading import Timer
 from random import choice
+
 
 
 # Create your views here.
@@ -51,7 +53,7 @@ class BuyQuestions(APIView):
         question=Question.objects.get(number=data["question_id"])
         if(QuestionStat.objects.filter(question=question).filter(team=team).count()!=0):
             return JsonResponse({"error":"already bough"},status=status.HTTP_400_BAD_REQUEST)
-        if(team.A<question.value and not LEVERAGE_TWO):
+        if(team.A<question.value and not get_leverage_two()):
             return JsonResponse({"error":"not enought money"},status=status.HTTP_400_BAD_REQUEST)
         
         
@@ -90,7 +92,6 @@ class BuyRandom(APIView):
 
 class ExchangeA(APIView):
     def post(self,request:HttpRequest):
-        global demand
     
         data=json.loads(request.body)
         team=Team.objects.get(id=data["team_id"])
@@ -98,13 +99,18 @@ class ExchangeA(APIView):
         if(amount>team.A):
             return JsonResponse({"error":"not enough currency"},status=status.HTTP_400_BAD_REQUEST)
         team.A=team.A-amount
-        demand+=amount
+        set_demand(get_demand()+change_to_b(amount))
+
         team.B=team.B+change_to_b(amount)
         team.save()
+        set_transactions(get_transactions()+change_to_b(amount))
+        if(get_transactions()>ALL_TRANSACTIONS):
+            set_transactions(0)
+            calcuate_b_a()
+
         return JsonResponse({"message":f"exchanged {change_to_b(amount)} B"})
 class ExchangeB(APIView):
     def post(self,request:HttpRequest):
-        global supply
         data=json.loads(request.body)
         team=Team.objects.get(id=data["team_id"])
         amount=data["amount"]
@@ -112,15 +118,19 @@ class ExchangeB(APIView):
             return JsonResponse({"error":"not enough currency"},status=status.HTTP_400_BAD_REQUEST)
         team.B=team.B-amount
         team.A=team.A+change_to_a(amount)
-        supply+=amount
+        set_supply(get_supply()+amount)
         team.save()
+        set_transactions(get_transactions()+amount)
+        if(get_transactions()>ALL_TRANSACTIONS):
+            set_transactions(0)
+            calcuate_b_a()
         return JsonResponse({"message":f"exchanged +{change_to_a(amount)} A"})
 
 class ScoreBoard(APIView):
     def get(self):
         result=dict()
         result.users=TeamSerializer(Team.objects.all(),many=True).data
-        result.rate=b_a_value
+        result.rate=get_b_a_value()
         return JsonResponse(data=result)
     
 class Attack(APIView):
@@ -159,8 +169,7 @@ class EndDuel(APIView):
 
         winner=Team.objects.get(id=data["winner_id"])
         duel.winner=winner
-        defender.stat=4
-        attacker.stat=4
+        
         
         
         if(attacker==winner):
@@ -171,14 +180,22 @@ class EndDuel(APIView):
         loose_fee=get_duel_loose_fee(looser,winner)
         win_fee=get_duel_win_fee(looser,winner)
         looser_B=looser.B
+        b_minus=min(loose_fee,looser_B)
         looser.B-=min(loose_fee,looser_B)
-        looser.A-=change_to_a(max(loose_fee-looser_B,0))
+        a_minus=max(looser_B-loose_fee,0)
+        looser.A-=change_to_a(max(looser_B-loose_fee,0))
+
         looser.A=max(looser.A,0)
-        winner.B+=win_fee
+        coef=1
+        if(get_leverage_three()):
+            coef=settings.LEVERAGE_TREE_COEF
+
+        winner.B+=coef*win_fee
         set_team_score(looser)
         set_team_score(winner)
         
-
+        looser.stat=4
+        winner.stat=4
         duel.save()
         winner.save()
         looser.save()
@@ -189,14 +206,13 @@ class EndDuel(APIView):
             attacker.stat=0
             defender.save()
             attacker.save()
-            print(1)
             
 
         # Schedule the function to run 5 minutes later
         t = Timer(COOL_DOWN_TIME, change_stat_later, [attacker,defender])
         t.start()
 
-        return JsonResponse({"message":"battle ended"})
+        return JsonResponse({f"message":f"battle ended"})
 
 class RejectDuel(APIView):
     def post(self,request):
@@ -241,9 +257,8 @@ class GetQuestions(APIView):
 
         for q in Question.objects.all().order_by("score"):  
             coef=1
-            if(LEVERAGE_ONE):
-                coef=LEVERAGE_ONE_COEF
-            print(q.value,coef,q.value*coef)
+            if(get_leverage_one()):
+                coef=settings.LEVERAGE_ONE_COEF
             result.append({"number":q.number,"bought":True,"max-score":q.score,"price":q.value*coef})
             query=QuestionStat.objects.filter(team__id=team).filter(question__number=q.number)
             if(query.count()==0):
@@ -251,7 +266,6 @@ class GetQuestions(APIView):
                 result[-1]["score"]=0
             else:
                 result[-1]["score"]=query[0].score
-        print(result)
         return JsonResponse(result,safe=False)
 class GetDuel(APIView):
     def get(self,request,team_id):
@@ -286,7 +300,6 @@ class GetGame(APIView):
         query=GameTeam.objects.filter( Q(team=team) & Q(finished=False))
     
         if(query.count()==0):
-            print(1)
             return JsonResponse({"active":False})
         
         
@@ -323,9 +336,17 @@ class EndGame(APIView):
         gt=GameTeam.objects.get( Q(team=team) & Q(finished=False))
         game=gt.game    
         gt.finished=True
-
+        added_score=0
         if(data["won"]):
-            team.B=team.B+game.score
+            added_score=game.score
+            if(not get_leverage_four()):
+                team.B=team.B+game.score
+             
+            else:
+                team.A=team.A+change_to_a(game.score)
+                
+
+
             team.save()
             
             gt.won=True
@@ -334,7 +355,7 @@ class EndGame(APIView):
         set_team_score(team)
         
         gt.save()
-        return JsonResponse({"message":"ended"})
+        return JsonResponse({"message":f"ended "})
 
 
 class SetScore(APIView):
@@ -348,10 +369,10 @@ class SetScore(APIView):
         
         qs=QuestionStat.objects.get(team=team,question=question)
         #ask this
-        if(not LEVERAGE_TWO):
+        if(not get_leverage_two()):
             team.A=team.A+score-qs.score
         else:
-            team.B=team.B+change_to_b(score)-qs.score
+            team.B=team.B+change_to_b(score)-change_to_b(qs.score)
         qs.score=score
         
         team.save()
@@ -383,19 +404,30 @@ class SetB(APIView):
 
 class GetLeverageStat(APIView):
     def get(self,request):
-        return JsonResponse({"lev1":LEVERAGE_ONE,"lev2":LEVERAGE_TWO})
+        return JsonResponse({"lev1":get_leverage_one(),"lev2":get_leverage_two(),"lev3":get_leverage_three(),"lev4":get_leverage_four()})
     
 
 class ToggleLeverage1(APIView):
     def post(self,reques):
-        global LEVERAGE_ONE
-        LEVERAGE_ONE=not LEVERAGE_ONE
-        print(1)
+        set_leverage_one(not get_leverage_one())
+        
         return JsonResponse({"message":"toggled"})
 
 class ToggleLeverage2(APIView):
     def post(self,reques):
-        global LEVERAGE_TWO
-        LEVERAGE_TWO=not LEVERAGE_TWO
+        set_leverage_two(not get_leverage_two())
+        return JsonResponse({"message":"toggled"})
+    
+
+class ToggleLeverage3(APIView):
+    def post(self,reques):
+        set_leverage_three(not get_leverage_three())
+
+        return JsonResponse({"message":"toggled"})
+    
+
+class ToggleLeverage4(APIView):
+    def post(self,reques):
+        set_leverage_four(not get_leverage_four())
         return JsonResponse({"message":"toggled"})
     

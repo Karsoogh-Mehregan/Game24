@@ -31,6 +31,8 @@ urlpatterns = [
     path("get-leverages",GetLeverageStat.as_view()),
     path("toggle-lev-1",ToggleLeverage1.as_view()),
     path("toggle-lev-2",ToggleLeverage2.as_view()),
+    path("toggle-lev-3",ToggleLeverage3.as_view()),
+    path("toggle-lev-4",ToggleLeverage4.as_view()),
     path("buy-random",BuyRandom.as_view()),
 
 

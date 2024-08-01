@@ -132,17 +132,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-b_a_value=1
-b_a_value=1
-b_for_duel=3
-b_for_reject=3
-supply=0
-demand=0
+
 K=1/10
-COOL_DOWN_TIME=5
+COOL_DOWN_TIME=300
 
 
-LEVERAGE_ONE=False
 LEVERAGE_ONE_COEF=2
-LEVERAGE_TWO=False
+LEVERAGE_TREE_COEF=1.5
+
+ALL_TRANSACTIONS=10
+TRANSACTIONS_LEFT=ALL_TRANSACTIONS
 A=40

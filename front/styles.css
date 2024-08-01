@@ -1,0 +1,142 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px;
+}
+
+.scoreboard-container, .chart-container {
+    width: 48%;
+}
+
+.scoreboard-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    position: relative;
+    height: 600px; /* Adjust based on your needs */
+    overflow: auto;
+}
+
+.chart-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+.scoreboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    height: 100%; /* Ensure full height to enable scrolling */
+    overflow: hidden;
+}
+
+.scoreboard-table th, .scoreboard-table td {
+    padding: 12px;
+    text-align: left;
+    white-space: nowrap; /* Prevents text from wrapping */
+}
+
+.scoreboard-table th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+tbody {
+    animation: scrollDownUp 100s ease-in-out infinite;
+}
+
+.scoreboard-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.scoreboard-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.scoreboard-table thead {
+    position: relative;
+    top: 0;
+    background-color: #4CAF50; /* Ensure the header has a background */
+    color: white;
+    z-index: 1;
+}
+
+.canvas-container {
+    width: 100%;
+}
+
+canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+#leverages {
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+#leverages p {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+}
+
+#leverages p span {
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+#leverages p.active {
+    color: #28a745; /* Green for active */
+}
+
+#leverages p.inactive {
+    color: #dc3545; /* Red for inactive */
+}
+
+#leverages p::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background-color: #ccc; /* Default color */
+}
+
+#leverages p.active::before {
+    background-color: #28a745; /* Green for active */
+}
+
+#leverages p.inactive::before {
+    background-color: #dc3545; /* Red for inactive */
+}
+
+#latestValue {
+    font-weight: bold;
+}
+
+@keyframes scrollDownUp {
+    3% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-60%); /* Adjust to fit the height of your scoreboard */
+    }
+    97% {
+        transform: translateY(0);
+    }
+}
