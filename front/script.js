@@ -87,7 +87,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Update the page with leverage and latest value information
-            document.getElementById('latestValue').textContent = latestValue;
             document.getElementById('lev1-status').textContent = leverageData.lev1 ? 'Active' : 'Inactive';
             document.getElementById('lev2-status').textContent = leverageData.lev2 ? 'Active' : 'Inactive';
             document.getElementById('lev3-status').textContent = leverageData.lev3 ? 'Active' : 'Inactive';
