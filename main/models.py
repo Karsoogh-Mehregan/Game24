@@ -22,8 +22,8 @@ class Team(models.Model):
     def __str__(self):
         return self.name
     def save(self, *args, **kwargs):
-        self.score=self.A/ALLInfo.objects.first().B_A_VALUE+self.B
-
+        self.score=self.A+self.B*ALLInfo.objects.first().B_A_VALUE
+        
         super().save(*args, **kwargs)
 
 

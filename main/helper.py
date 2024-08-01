@@ -176,6 +176,6 @@ def calcuate_b_a():
     
 def set_team_score(team:Team):
     
-    team.score=change_to_b(team.A)+team.B
+    team.score=team.A+change_to_a(team.B)
 
     team.save()

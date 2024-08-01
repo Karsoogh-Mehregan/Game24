@@ -1,9 +1,10 @@
+path="http://127.0.0.1:3000/"
 document.addEventListener('DOMContentLoaded', function() {
     let chartInstance = null; // Variable to hold the chart instance
 
     // Function to fetch and display scoreboard data
     function fetchScoreboardData() {
-        const scoreboardUrl = 'http://127.0.0.1:3000/teams'; // Replace with your API URL
+        const scoreboardUrl = path+'teams'; // Replace with your API URL
         fetch(scoreboardUrl)
             .then(response => response.json())
             .then(data => {
@@ -29,8 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to initialize or update the chart
     function fetchChartAndLeverageData() {
-        const chartUrl = 'http://127.0.0.1:3000/ba'; // Replace with your API URL
-        const leverageUrl = 'http://127.0.0.1:3000/get-leverages'; // Replace with your API URL
+        const chartUrl = path+'ba'; // Replace with your API URL
+        const leverageUrl = path+'get-leverages'; // Replace with your API URL
         let latestValue = 'Loading...';
 
         Promise.all([
