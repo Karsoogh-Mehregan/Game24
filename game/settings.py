@@ -133,7 +133,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-K=1/10
+K=1/30
 COOL_DOWN_TIME=300
 
 
