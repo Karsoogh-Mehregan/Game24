@@ -373,7 +373,8 @@ class SetScore(APIView):
         qs=QuestionStat.objects.get(team=team,question=question)
         #ask this
         if(not get_leverage_two()):
-            team.A=team.A+score-qs.score
+            if(get_leverage_one()):
+                team.A=team.A+score*settings.LEVERAGE_ONE_COEF-qs.score
         else:
             team.B=team.B+change_to_b(score)-change_to_b(qs.score)
         qs.score=score
