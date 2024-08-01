@@ -375,6 +375,9 @@ class SetScore(APIView):
         if(not get_leverage_two()):
             if(get_leverage_one()):
                 team.A=team.A+score*settings.LEVERAGE_ONE_COEF-qs.score
+            else:
+                team.A=team.A+score-qs.score
+
         else:
             team.B=team.B+change_to_b(score)-change_to_b(qs.score)
         qs.score=score
