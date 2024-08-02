@@ -31,6 +31,8 @@ class Team(models.Model):
 class Duel(models.Model):
     attacker=models.ForeignKey(Team,related_name="duels",on_delete=models.CASCADE)
     defender=models.ForeignKey(Team,on_delete=models.CASCADE,related_name="defenders")
+    attacker_score=models.FloatField()
+    defender_score=models.FloatField()
     winner=models.ForeignKey(Team,blank=True,null=True,default=None,on_delete=models.CASCADE,related_name="winners")
     #None means has not yet been started and -1 means rejected
 

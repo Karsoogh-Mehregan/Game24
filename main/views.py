@@ -146,7 +146,7 @@ class Attack(APIView):
             return JsonResponse({"error":"cant start a battle"},status=status.HTTP_400_BAD_REQUEST)
         if(attacker.B<fee):
             return JsonResponse({"error":"not enought money"},status=status.HTTP_400_BAD_REQUEST)
-        Duel.objects.create(attacker=attacker,defender=defender,winner=None)
+        Duel.objects.create(attacker=attacker,defender=defender,defender_score=defender.score,attacker_score=attacker.score,winner=None)
         attacker.B=attacker.B-fee
         defender.stat=2
         attacker.stat=1
@@ -174,19 +174,27 @@ class EndDuel(APIView):
         duel.winner=winner
         
         
-        
+        looser_score=0
+        winner_score=0
         if(attacker==winner):
+            looser_score=defender.score
+            winner_score=attacker.score
             looser=defender
         else:
+            looser_score=attacker.score
+            winner_score=defender.score
             looser=attacker
         
-        loose_fee=get_duel_loose_fee(looser,winner)
-        win_fee=get_duel_win_fee(looser,winner)
+        loose_fee=get_duel_loose_fee(looser,winner,looser_score,winner_score)
+        win_fee=get_duel_win_fee(looser,winner,looser_score,winner_score)
+        print(win_fee,loose_fee)
         looser_B=looser.B
         b_minus=min(loose_fee,looser_B)
         looser.B-=min(loose_fee,looser_B)
         a_minus=max(looser_B-loose_fee,0)
-        looser.A-=change_to_a(max(looser_B-loose_fee,0))
+        print(max(looser_B-loose_fee,0))
+        looser.A-=change_to_a(max(loose_fee-looser_B,0))
+        print(change_to_a(max(looser_B-loose_fee,0)))
 
         looser.A=max(looser.A,0)
         coef=1

@@ -144,22 +144,24 @@ def get_reject_fee(attacker,defender):
     return 2
 
 
-def get_duel_loose_fee(looser:Team,winner:Team):
-    if(winner.score>looser.score):
-        return (winner.score-looser.score)*0.025
+def get_duel_loose_fee(looser:Team,winner:Team,looser_score,winner_score):
+    if(winner_score>looser_score):
+        print((winner_score-looser_score)*0.025)
+        return (winner_score-looser_score)*0.025
         
     else:
-        return (looser.score-winner.score)*0.1
+        return (looser_score-winner_score)*0.1
 
 
 
-def get_duel_win_fee(looser,winner):
-    if(winner.score>looser.score):
-        delta=(winner.score-looser.score)*0.025
+def get_duel_win_fee(looser,winner,looser_score,winner_score):
+    if(winner_score>looser_score):
+        print((winner_score-looser_score)*0.025)
+        delta=(winner_score-looser_score)*0.025
     else:
-        delta=(looser.score-winner.score)*0.1
+        delta=(looser_score-winner_score)*0.1
         
-    return 40+delta
+    return 4+delta
 
 def calcuate_b_a():
     global K
