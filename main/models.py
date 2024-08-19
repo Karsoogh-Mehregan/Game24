@@ -35,6 +35,8 @@ class Duel(models.Model):
     defender_score=models.FloatField()
     winner=models.ForeignKey(Team,blank=True,null=True,default=None,on_delete=models.CASCADE,related_name="winners")
     #None means has not yet been started and -1 means rejected
+    def __str__(self):
+        return self.attacker.name+" vs "+self.defender.name
 
 
 class Question(models.Model):
@@ -49,6 +51,8 @@ class QuestionStat(models.Model):
     team=models.ForeignKey(Team,on_delete=models.CASCADE)
     question=models.ForeignKey(Question,on_delete=models.CASCADE)
     score=models.FloatField(default=0)
+    def __str__(self):
+        return self.team.name+' '+str(self.question.number)
     
 
 

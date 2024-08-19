@@ -105,10 +105,5 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchScoreboardData();
     fetchChartAndLeverageData();
 
-    // Set up the interval to call fetchScoreboardData and fetchChartAndLeverageData every 3 seconds
-    setInterval(function() {
-        console.log(1);
-        fetchScoreboardData();
-        fetchChartAndLeverageData();
-    }, 3000); // 3,000 milliseconds = 3 seconds
+  
 });

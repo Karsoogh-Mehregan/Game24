@@ -243,6 +243,7 @@ class RejectDuel(APIView):
         attacker.save()
         duel.save()
         defender.save()
+        duel.delete()
         return JsonResponse({"message":"duel rejected"})
     
 
